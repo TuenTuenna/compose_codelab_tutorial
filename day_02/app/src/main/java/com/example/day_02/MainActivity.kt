@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,9 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,7 +49,8 @@ class MainActivity : ComponentActivity() {
 //                CustomModifierTest()
 //                LayoutsCodelab()
 //                MyColumnTest()
-                MyRowTest()
+//                MyRowTest()
+                DecoupledConstraintLayout()
 //                StaggeredVertiacalGridTest()
 //                    StaggeredGridGoogleExample()
 //                TwoTexts(modifier = Modifier,"오늘도", "빡코딩")
@@ -104,7 +106,9 @@ fun StaggeredGridGoogleExample(modifier: Modifier = Modifier) {
 
 @Composable
 fun TwoTexts(modifier: Modifier = Modifier, text1: String, text2: String) {
-    Row(modifier = modifier.background(Color.Yellow).height(IntrinsicSize.Min)) {
+    Row(modifier = modifier
+        .background(Color.Yellow)
+        .height(IntrinsicSize.Min)) {
         Text(
             modifier = Modifier
                 .weight(1f)
@@ -148,36 +152,81 @@ fun TwoTextsPreview() {
 
 @Composable
 fun DecoupledConstraintLayout() {
+
+    val buttonId : String = "MyButton"
+    val addingMarginBtnId : String = "AddingMarginBtnId"
+    val textId : String = "MyText"
+
+    // 추가된 마진
+    val addedMargin = remember{ mutableStateOf(0.dp) }
+
+    // https://developer.android.com/jetpack/compose/animation?hl=ko#animationspec
+    val animatedMargin = animateDpAsState(
+        targetValue = addedMargin.value,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioHighBouncy,
+            stiffness = Spring.StiffnessMedium
+        )
+    )
+
     BoxWithConstraints {
+
         val constraints = if (maxWidth < maxHeight) {
-            decoupledConstraints(margin = 16.dp) // Portrait constraints
+            decoupledConstraints(
+                addingMarginBtnId,
+                buttonId,
+                textId,
+                margin = 16.dp,
+                addedMargin = animatedMargin.value) // Portrait constraints
         } else {
-            decoupledConstraints(margin = 100.dp) // Landscape constraints
+            decoupledConstraints(
+                addingMarginBtnId,
+                buttonId,
+                textId,
+                margin = 100.dp,
+                addedMargin = animatedMargin.value
+            ) // Landscape constraints
         }
 
         ConstraintLayout(constraints) {
             Button(
                 onClick = { /* Do something */ },
-                modifier = Modifier.layoutId("button")
+                modifier = Modifier.layoutId(buttonId)
             ) {
                 Text("Button")
             }
 
-            Text("Text", Modifier.layoutId("text"))
+            Button(
+                modifier = Modifier.layoutId(addingMarginBtnId),
+                onClick = {
+                    addedMargin.value = addedMargin.value + 100.dp
+            }) {
+                Text(text = "마진 추가 버튼")
+            }
+
+            Text("Text", Modifier.layoutId(textId))
         }
     }
 }
 
-private fun decoupledConstraints(margin: Dp): ConstraintSet {
+
+private fun decoupledConstraints(addingMarginBtnId: String,
+                                 buttonId: String,
+                                 textId: String,
+                                 margin: Dp, addedMargin: Dp): ConstraintSet {
     return ConstraintSet {
-        val button = createRefFor("button")
-        val text = createRefFor("text")
+        val button = createRefFor(buttonId)
+        val text = createRefFor(textId)
+        val addingMarginBtn = createRefFor(addingMarginBtnId)
 
         constrain(button) {
             top.linkTo(parent.top, margin= margin)
         }
         constrain(text) {
             top.linkTo(button.bottom, margin)
+        }
+        constrain(addingMarginBtn){
+            top.linkTo(text.bottom, margin = addedMargin)
         }
     }
 }
@@ -316,13 +365,22 @@ fun MyRowTest(){
     Scaffold() {
         MyOwnRow(modifier = Modifier.background(Color.Yellow)) {
             Text(text = "하나 하나 하나 ",
-                modifier = Modifier.padding(4.dp).background(Color.Green).height(100.dp)
+                modifier = Modifier
+                    .padding(4.dp)
+                    .background(Color.Green)
+                    .height(100.dp)
             )
             Text(text = "둘 둘 둘",
-                modifier = Modifier.padding(4.dp).background(Color.Blue).height(30.dp)
+                modifier = Modifier
+                    .padding(4.dp)
+                    .background(Color.Blue)
+                    .height(30.dp)
             )
             Text(text = "셋",
-                modifier = Modifier.padding(4.dp).background(Color.Magenta).height(50.dp)
+                modifier = Modifier
+                    .padding(4.dp)
+                    .background(Color.Magenta)
+                    .height(50.dp)
             )
         }
     }
