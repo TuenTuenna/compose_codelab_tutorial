@@ -48,10 +48,10 @@ class MainActivity : ComponentActivity() {
 //                CustomModifierTest()
 //                LayoutsCodelab()
 //                MyColumnTest()
-//                MyRowTest()
+                MyRowTest()
 //                StaggeredVertiacalGridTest()
 //                    StaggeredGridGoogleExample()
-                TwoTexts(modifier = Modifier,"오늘도", "빡코딩")
+//                TwoTexts(modifier = Modifier,"오늘도", "빡코딩")
 //                Surface(color = MaterialTheme.colors.background) {
 //                    PhotographerCard(modifier = Modifier.fillMaxWidth(1f)){
 //                        Column() {
@@ -315,9 +315,15 @@ fun MyColumnTest(){
 fun MyRowTest(){
     Scaffold() {
         MyOwnRow(modifier = Modifier.background(Color.Yellow)) {
-            Text(text = "하나", modifier = Modifier.padding(4.dp))
-            Text(text = "둘", modifier = Modifier.padding(4.dp))
-            Text(text = "셋", modifier = Modifier.padding(4.dp))
+            Text(text = "하나 하나 하나 ",
+                modifier = Modifier.padding(4.dp).background(Color.Green).height(100.dp)
+            )
+            Text(text = "둘 둘 둘",
+                modifier = Modifier.padding(4.dp).background(Color.Blue).height(30.dp)
+            )
+            Text(text = "셋",
+                modifier = Modifier.padding(4.dp).background(Color.Magenta).height(50.dp)
+            )
         }
     }
 }
