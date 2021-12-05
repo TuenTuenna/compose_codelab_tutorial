@@ -1,26 +1,20 @@
 package com.example.day_02
 
+import android.annotation.SuppressLint
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
 
 
-fun Modifier.customLayoutModifier() : Modifier {
-    return this.then(
 
-        layout { measurable, constraints ->
-
-            val placeable = measurable.measure(constraints)
-
-//            // Check the composable has a first baseline
-//            check(placeable[FirstBaseline] != AlignmentLine.Unspecified)
-//            val firstBaseline = placeable[FirstBaseline]
+//@SuppressLint("ModifierFactoryUnreferencedReceiver")
+//fun Modifier.customLayoutModifier() : Modifier {
+//    return Modifier.layout { measurable, constraints ->
 //
-//            // Height of the composable with padding - first baseline
-//            val placeableY = firstBaselineToTop.roundToPx() - firstBaseline
-//            val height = placeable.height + placeableY
-            layout(placeable.width, placeable.height) {
-                // Where the composable gets placed
-                placeable.placeRelative(0, 0)
-            }
-    })
-}
+//        val placeable = measurable.measure(constraints = constraints)
+//
+//        layout(placeable.width, placeable.height){
+//            placeable.place(placeable.width, placeable.height)
+//        }
+//    }
+//}
+
